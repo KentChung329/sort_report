@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>氣泡排序法動畫</title>
+    <script>
+        // 若直接開啟（不是從首頁連結過來），自動跳回首頁
+        if (!document.referrer || !document.referrer.includes('index.html')) {
+            location.replace('index.html');
+        }
+    </script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -201,9 +207,33 @@
         }
 
         .explain h3 { color: #fff; margin-bottom: 8px; }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            align-self: flex-start;
+            margin-bottom: 24px;
+            padding: 8px 18px;
+            border-radius: 8px;
+            background: #1a1a2e;
+            border: 1px solid #444;
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            border-color: #7b2ff7;
+            color: #fff;
+            background: rgba(123, 47, 247, 0.15);
+        }
     </style>
 </head>
 <body>
+
+    <a class="back-btn" href="index.html">← 返回首頁</a>
 
     <h1>🫧 氣泡排序法</h1>
     <p class="subtitle">Bubble Sort — 視覺化動畫解說</p>
