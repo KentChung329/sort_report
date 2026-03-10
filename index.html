@@ -2,33 +2,112 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>氣泡排序法動畫</title>
-    <script>
-        // 若直接開啟（不是從首頁連結過來），自動跳回首頁
-        if (!document.referrer || !document.referrer.includes('index.html')) {
-            location.replace('index.html');
-        }
-    </script>
+    <title>排序演算法視覺化</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            background: #0f0f1a;
-            color: #fff;
-            font-family: 'Segoe UI', sans-serif;
+        /* ===== 首頁樣式 ===== */
+        #page-home {
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .card {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 32px 28px;
+            width: 260px;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: #7b2ff7;
+            box-shadow: 0 8px 30px rgba(123, 47, 247, 0.35);
+        }
+
+        .card .icon { font-size: 3rem; margin-bottom: 16px; }
+
+        .card .card-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #00d4ff, #7b2ff7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card .card-desc {
+            color: #aaa;
+            font-size: 0.88rem;
+            line-height: 1.7;
+        }
+
+        .card .badge {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            background: rgba(123, 47, 247, 0.25);
+            color: #b57bff;
+            border: 1px solid rgba(123, 47, 247, 0.5);
+        }
+
+        .home-footer {
+            margin-top: 60px;
+            color: #555;
+            font-size: 0.82rem;
+        }
+
+        /* ===== 排序頁樣式 ===== */
+        #page-sort {
+            display: none;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
             padding: 30px 20px;
         }
 
+        body {
+            background: #0f0f1a;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
         h1 {
-            font-size: 2rem;
-            margin-bottom: 8px;
             background: linear-gradient(90deg, #00d4ff, #7b2ff7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        #page-sort h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        #page-home h1 {
+            font-size: 2.6rem;
+            margin-bottom: 10px;
+            text-align: center;
         }
 
         .subtitle {
@@ -233,7 +312,50 @@
 </head>
 <body>
 
-    <a class="back-btn" href="index.html">← 返回首頁</a>
+    <!-- ===== 首頁 ===== -->
+    <div id="page-home">
+        <h1>🧮 排序演算法視覺化</h1>
+        <p class="subtitle" style="margin-bottom:50px;">Sorting Algorithms — 互動式動畫學習平台</p>
+
+        <div class="card-grid">
+            <div class="card" onclick="showSort()">
+                <div class="icon">🫧</div>
+                <div class="card-title">氣泡排序法</div>
+                <div class="card-desc">
+                    兩兩比較相鄰元素，把最大值逐步「浮」到右端。<br>
+                    時間複雜度：O(n²)
+                </div>
+                <span class="badge">Bubble Sort</span>
+            </div>
+
+            <div class="card" style="opacity:0.4; cursor:not-allowed;" title="即將推出">
+                <div class="icon">🔀</div>
+                <div class="card-title">選擇排序法</div>
+                <div class="card-desc">
+                    每輪找最小值，移到已排序區末端。<br>
+                    時間複雜度：O(n²)
+                </div>
+                <span class="badge">即將推出</span>
+            </div>
+
+            <div class="card" style="opacity:0.4; cursor:not-allowed;" title="即將推出">
+                <div class="icon">🃏</div>
+                <div class="card-title">插入排序法</div>
+                <div class="card-desc">
+                    逐一取出元素，插入已排序序列的正確位置。<br>
+                    時間複雜度：O(n²)
+                </div>
+                <span class="badge">即將推出</span>
+            </div>
+        </div>
+
+        <div class="home-footer">計算機概論 · 114-2 · 中原大學</div>
+    </div>
+
+    <!-- ===== 排序頁 ===== -->
+    <div id="page-sort">
+
+    <a class="back-btn" href="#" onclick="showHome(); return false;">← 返回首頁</a>
 
     <h1>🫧 氣泡排序法</h1>
     <p class="subtitle">Bubble Sort — 視覺化動畫解說</p>
@@ -398,6 +520,20 @@
         }
 
         resetArray();
+
+        function showSort() {
+            document.getElementById('page-home').style.display = 'none';
+            const sort = document.getElementById('page-sort');
+            sort.style.display = 'flex';
+            resetArray();
+        }
+
+        function showHome() {
+            document.getElementById('page-sort').style.display = 'none';
+            document.getElementById('page-home').style.display = 'flex';
+        }
     </script>
+
+    </div><!-- end #page-sort -->
 </body>
 </html>
