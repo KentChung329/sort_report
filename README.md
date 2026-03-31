@@ -130,7 +130,7 @@
 > 以下為本次排序演算法視覺化模擬的實際介面，透過色彩與長條圖的高低，可以直觀看出資料在記憶體中的交換與比較過程。
 
 <p align="center">
-  <img src="./image.jpeg.png" alt="排序系統介面預覽" width="80%">
+  <img src="./image.jepg.png" alt="排序系統介面預覽" width="80%">
 </p>
 
 ---
