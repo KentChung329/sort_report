@@ -1,437 +1,7 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <title>排序演算法視覺化</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* ===== 首頁樣式 ===== */
-        #page-home {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px 10px;
-        }
-
-        .card-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: center;
-            max-width: 900px;
-            width: 100%;
-        }
-
-        .card {
-            background: #1a1a2e;
-            border: 1px solid #333;
-            border-radius: 16px;
-            padding: 24px 20px;
-            width: 250px;
-            min-height: 250px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            text-align: center;
-            text-decoration: none;
-            color: inherit;
-            transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
-            cursor: pointer;
-        }
-
-        .card:hover {
-            transform: translateY(-6px);
-            border-color: #7b2ff7;
-            box-shadow: 0 8px 30px rgba(123, 47, 247, 0.35);
-        }
-
-        .card .icon { font-size: 2.8rem; margin-bottom: 14px; }
-
-        .card .card-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-            background: linear-gradient(90deg, #00d4ff, #7b2ff7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .card .card-desc {
-            color: #aaa;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            flex-grow: 1;
-        }
-
-        .card .badge {
-            display: inline-block;
-            margin-top: 14px;
-            padding: 4px 12px;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            background: rgba(123, 47, 247, 0.25);
-            color: #b57bff;
-            border: 1px solid rgba(123, 47, 247, 0.5);
-        }
-
-        .home-footer {
-            margin-top: 30px;
-            color: #555;
-            font-size: 0.82rem;
-        }
-
-        /* ===== 排序頁樣式 ===== */
-        #page-sort {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 30px 20px;
-        }
-
-        body {
-            background: #0f0f1a;
-            color: #fff;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        h1 {
-            background: linear-gradient(90deg, #00d4ff, #7b2ff7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        #page-sort h1 {
-            font-size: 2rem;
-            margin-bottom: 8px;
-        }
-
-        #page-home h1 {
-            font-size: 2.2rem;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        .subtitle {
-            color: #aaa;
-            margin-bottom: 30px;
-            font-size: 0.95rem;
-        }
-
-        .controls {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        button {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-
-        #startBtn {
-            background: linear-gradient(135deg, #00d4ff, #7b2ff7);
-            color: white;
-        }
-
-        #resetBtn {
-            background: #2a2a3a;
-            color: #ccc;
-            border: 1px solid #444;
-        }
-
-        button:hover { transform: scale(1.05); }
-        button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-        .speed-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #aaa;
-            font-size: 0.9rem;
-        }
-
-        input[type=range] {
-            accent-color: #7b2ff7;
-            width: 120px;
-        }
-
-        .array-container {
-            display: flex;
-            align-items: flex-end;
-            gap: 8px;
-            height: 300px;
-            margin-bottom: 30px;
-            padding: 0 10px;
-        }
-
-        .bar {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            width: 60px;
-            transition: height 0.3s ease, background 0.2s;
-            border-radius: 6px 6px 0 0;
-            position: relative;
-        }
-
-        .bar .bar-inner {
-            width: 100%;
-            border-radius: 6px 6px 0 0;
-            transition: height 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            padding-top: 6px;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .bar .bar-label {
-            color: #aaa;
-            font-size: 0.8rem;
-            margin-top: 6px;
-        }
-
-        .bar.default .bar-inner { background: linear-gradient(180deg, #4a9eff, #1a5fc8); color: white; }
-        .bar.comparing .bar-inner { background: linear-gradient(180deg, #ff6b6b, #cc0000); color: white; }
-        .bar.swapping .bar-inner { background: linear-gradient(180deg, #ffd93d, #f39c12); color: #333; }
-        .bar.sorted .bar-inner { background: linear-gradient(180deg, #6bff9e, #00a651); color: #333; }
-
-        .info-box {
-            background: #1a1a2e;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 16px 24px;
-            width: 100%;
-            max-width: 600px;
-            margin-bottom: 20px;
-            min-height: 60px;
-            text-align: center;
-            font-size: 1.05rem;
-            line-height: 1.6;
-        }
-
-        .info-box .step-title {
-            color: #00d4ff;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .info-box .step-desc {
-            color: #ddd;
-        }
-
-        .stats {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat .val {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #7b2ff7;
-        }
-
-        .stat .label {
-            color: #aaa;
-            font-size: 0.85rem;
-        }
-
-        .legend {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            color: #aaa;
-        }
-
-        .legend-color {
-            width: 18px;
-            height: 18px;
-            border-radius: 4px;
-        }
-
-        .explain {
-            background: #1a1a2e;
-            border-left: 4px solid #7b2ff7;
-            padding: 14px 18px;
-            border-radius: 0 8px 8px 0;
-            max-width: 600px;
-            width: 100%;
-            font-size: 0.9rem;
-            color: #ccc;
-            line-height: 1.8;
-        }
-
-        .explain h3 { color: #fff; margin-bottom: 8px; }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            align-self: flex-start;
-            margin-bottom: 24px;
-            padding: 8px 18px;
-            border-radius: 8px;
-            background: #1a1a2e;
-            border: 1px solid #444;
-            color: #aaa;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        .back-btn:hover {
-            border-color: #7b2ff7;
-            color: #fff;
-            background: rgba(123, 47, 247, 0.15);
-        }
-    </style>
-</head>
-<body>
-
-    <!-- ===== 首頁 ===== -->
-    <div id="page-home">
-        <h1>🧮 排序演算法視覺化</h1>
-        <p class="subtitle" style="margin-bottom:20px;">Sorting Algorithms — 互動式動畫學習平台</p>
-
-        <div class="card-grid">
-            <div class="card" onclick="showSort('bubble')">
-                <div class="icon">🫧</div>
-                <div class="card-title">氣泡排序法</div>
-                <div class="card-desc">
-                    兩兩比較相鄰元素，把最大值逐步「浮」到右端。<br>
-                    時間複雜度：O(n²)
-                </div>
-                <span class="badge">Bubble Sort</span>
-            </div>
-
-            <div class="card" onclick="showSort('selection')">
-                <div class="icon">🔀</div>
-                <div class="card-title">選擇排序法</div>
-                <div class="card-desc">
-                    每輪找最小值，移到已排序區末端。<br>
-                    時間複雜度：O(n²)
-                </div>
-                <span class="badge">Selection Sort</span>
-            </div>
-
-            <div class="card" onclick="showSort('insertion')">
-                <div class="icon">🃏</div>
-                <div class="card-title">插入排序法</div>
-                <div class="card-desc">
-                    逐一取出元素，插入已排序序列的正確位置。<br>
-                    時間複雜度：O(n²)
-                </div>
-                <span class="badge">Insertion Sort</span>
-            </div>
-
-            <div class="card" onclick="showSort('merge')">
-                <div class="icon">🧬</div>
-                <div class="card-title">合併排序法</div>
-                <div class="card-desc">
-                    將陣列對半分割直到剩一個，再兩兩合併。<br>
-                    時間複雜度：O(n log n)
-                </div>
-                <span class="badge">Merge Sort</span>
-            </div>
-
-            <div class="card" onclick="showSort('quick')">
-                <div class="icon">⚡</div>
-                <div class="card-title">快速排序法</div>
-                <div class="card-desc">
-                    挑選基準點，將小於基準放左邊、大於放右邊。<br>
-                    時間複雜度：O(n log n)
-                </div>
-                <span class="badge">Quick Sort</span>
-            </div>
-        </div>
-
-        <div class="home-footer">11428211鐘茝翔 · 114-2 · 計算機概論</div>
-    </div>
-
-    <!-- ===== 排序頁 ===== -->
-    <div id="page-sort">
-
-    <a class="back-btn" href="#" onclick="showHome(); return false;">← 返回首頁</a>
-
-    <h1 id="algoTitle">🫧 氣泡排序法</h1>
-    <p class="subtitle" id="algoSubtitle">Bubble Sort — 視覺化動畫解說</p>
-
-    <div class="controls">
-        <button id="startBtn" onclick="startSort()">▶ 開始排序</button>
-        <button id="resetBtn" onclick="resetArray()">🔄 重新隨機</button>
-        <div class="speed-control">
-            <span>速度：</span>
-            <input type="range" id="speedSlider" min="1" max="10" value="5">
-            <span id="speedLabel">中</span>
-        </div>
-        <button id="pauseBtn" onclick="togglePause()" disabled style="background: #4a9eff; color: white;">⏸ 暫停</button>
-    </div>
-
-    <div class="legend">
-        <div class="legend-item"><div class="legend-color" style="background:#4a9eff"></div>未排序</div>
-        <div class="legend-item"><div class="legend-color" style="background:#ff6b6b"></div>比較中</div>
-        <div class="legend-item"><div class="legend-color" style="background:#ffd93d"></div>交換中</div>
-        <div class="legend-item"><div class="legend-color" style="background:#6bff9e"></div>已排序</div>
-    </div>
-
-    <div class="array-container" id="arrayContainer"></div>
-
-    <div class="stats">
-        <div class="stat"><div class="val" id="compCount">0</div><div class="label">比較次數</div></div>
-        <div class="stat"><div class="val" id="swapCount">0</div><div class="label">交換次數</div></div>
-        <div class="stat"><div class="val" id="roundCount">0</div><div class="label">目前輪數</div></div>
-    </div>
-
-    <div class="info-box" id="infoBox">
-        <div class="step-title">準備就緒</div>
-        <div class="step-desc">按「開始排序」來觀看氣泡排序動畫</div>
-    </div>
-
-    <div class="explain" id="algoExplain">
-        <h3>📖 氣泡排序原理</h3>
-        每輪從頭開始，兩兩比較相鄰元素<br>
-        若 <b>左 &gt; 右</b>，則交換位置<br>
-        每輪結束後，<b>最大值會「浮」到最右邊</b><br>
-        重複 n-1 輪，直到全部排序完成<br>
-        <br>
-        ⏱ 時間複雜度：最差 O(n²)，最好 O(n)
-    </div>
-
-    <script>
         let arr = [];
         let sorting = false;
         let isPaused = false;
-        let isStopped = false; // 用於強制終止排序
         let comparisons = 0;
         let swaps = 0;
         let currentAlgo = 'bubble';
@@ -510,12 +80,8 @@
 
         async function sleep(ms) {
             await new Promise(resolve => setTimeout(resolve, ms));
-            while (isPaused && !isStopped) {
+            while (isPaused) {
                 await new Promise(resolve => setTimeout(resolve, 50));
-            }
-            if (isStopped) {
-                // 如果觸發停止，拋出錯誤來中斷整條 async 執行鏈
-                throw new Error("SORTING_STOPPED");
             }
         }
 
@@ -577,7 +143,6 @@
         async function startSort() {
             if (sorting || arr.length === 0) return;
             sorting = true;
-            isStopped = false;
             document.getElementById('startBtn').disabled = true;
             document.getElementById('resetBtn').disabled = true;
             
@@ -586,29 +151,21 @@
             
             comparisons = 0; swaps = 0;
 
-            try {
-                if (currentAlgo === 'bubble') {
-                    await runBubbleSort();
-                } else if (currentAlgo === 'selection') {
-                    await runSelectionSort();
-                } else if (currentAlgo === 'insertion') {
-                    await runInsertionSort();
-                } else if (currentAlgo === 'merge') {
-                    await runMergeSort();
-                } else if (currentAlgo === 'quick') {
-                    await runQuickSort();
-                }
-            } catch (e) {
-                if (e.message === "SORTING_STOPPED") {
-                    console.log("排序被強制終止");
-                } else {
-                    console.error(e);
-                }
+            if (currentAlgo === 'bubble') {
+                await runBubbleSort();
+            } else if (currentAlgo === 'selection') {
+                await runSelectionSort();
+            } else if (currentAlgo === 'insertion') {
+                await runInsertionSort();
+            } else if (currentAlgo === 'merge') {
+                await runMergeSort();
+            } else if (currentAlgo === 'quick') {
+                await runQuickSort();
             }
 
             sorting = false;
             isPaused = false;
-            isStopped = false;
+            const pauseBtn = document.getElementById('pauseBtn');
             pauseBtn.disabled = true;
             pauseBtn.innerHTML = '⏸ 暫停';
             pauseBtn.style.background = '#4a9eff';
@@ -924,16 +481,8 @@
         }
 
         function showHome() {
-            if (sorting) {
-                // 如果正在排序(包含暫停)，則強制中斷並還原狀態
-                isStopped = true;
-                isPaused = false;
-            }
+            if (sorting) return; // Prevent returning if playing
             document.getElementById('page-sort').style.display = 'none';
             document.getElementById('page-home').style.display = 'flex';
         }
-    </script>
-
-    </div><!-- end #page-sort -->
-</body>
-</html>
+    
