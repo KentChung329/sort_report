@@ -338,18 +338,18 @@
                 <span class="badge">Selection Sort</span>
             </div>
 
-            <div class="card" style="opacity:0.4; cursor:not-allowed;" title="即將推出">
+            <div class="card" onclick="showSort('insertion')">
                 <div class="icon">🃏</div>
                 <div class="card-title">插入排序法</div>
                 <div class="card-desc">
                     逐一取出元素，插入已排序序列的正確位置。<br>
                     時間複雜度：O(n²)
                 </div>
-                <span class="badge">即將推出</span>
+                <span class="badge">Insertion Sort</span>
             </div>
         </div>
 
-        <div class="home-footer">計算機概論 · 114-2 · 鐘茝翔11428211</div>
+        <div class="home-footer">11428211鐘茝翔 · 114-2 · 計算機概論</div>
     </div>
 
     <!-- ===== 排序頁 ===== -->
@@ -431,6 +431,17 @@
         重複 n-1 輪，直到全部排序完成<br>
         <br>
         ⏱ 時間複雜度：O(n²)`
+            },
+            insertion: {
+                title: '🃏 插入排序法',
+                subtitle: 'Insertion Sort — 視覺化動畫解說',
+                readyDesc: '按「開始排序」來觀看插入排序動畫',
+                explain: `<h3>📖 插入排序原理</h3>
+        將陣列分為「已排序」和「未排序」區間<br>
+        每次把未排序區間的第一個元素，<b>插入到已排序區間的正確位置</b><br>
+        重複 n-1 輪，直到全部排序完成<br>
+        <br>
+        ⏱ 時間複雜度：最差 O(n²)，最好 O(n)`
             }
         };
 
@@ -499,6 +510,8 @@
                 await runBubbleSort();
             } else if (currentAlgo === 'selection') {
                 await runSelectionSort();
+            } else if (currentAlgo === 'insertion') {
+                await runInsertionSort();
             }
 
             sorting = false;
@@ -610,6 +623,61 @@
             for (let k = 0; k < n; k++) if (!sortedIdx.includes(k)) sortedIdx.push(k);
             renderBars(arr, [], sortedIdx);
             setInfo('🏆 排序完成！', `共比較 ${comparisons} 次，交換 ${swaps} 次`);
+        }
+
+        async function runInsertionSort() {
+            const n = arr.length;
+            const sortedIdx = [0]; // 第一個元素預設已排序
+
+            for (let i = 1; i < n; i++) {
+                document.getElementById('roundCount').textContent = i;
+                let currentVal = arr[i];
+                let j = i - 1;
+
+                setInfo(`🔁 第 ${i} 輪`, `取出 [${i}]=${currentVal} 準備插入已排序區間`);
+                renderBars(arr, [i], sortedIdx);
+                await sleep(getDelay());
+
+                while (j >= 0) {
+                    comparisons++;
+                    updateStats();
+                    renderBars(arr, [j, j + 1], sortedIdx); // 比較
+                    setInfo(`🔍 比較`, `目前元素 ${currentVal} 和 [${j}]=${arr[j]}`);
+                    await sleep(getDelay());
+
+                    if (arr[j] > currentVal) {
+                        setInfo(`🔄 將 ${arr[j]} 往右移`, `因為 ${arr[j]} > ${currentVal}`);
+                        renderBars(arr, [], sortedIdx, [j, j + 1]); 
+                        await sleep(getDelay() * 0.8);
+                        arr[j + 1] = arr[j];
+                        swaps++;
+                        updateStats();
+                        renderBars(arr, [], sortedIdx, [j, j + 1]); 
+                        await sleep(getDelay() * 0.8);
+                        j--;
+                    } else {
+                        setInfo(`✅ 找到位置`, `${arr[j]} ≤ ${currentVal}，停止移動`);
+                        await sleep(getDelay());
+                        break;
+                    }
+                }
+                
+                arr[j + 1] = currentVal;
+                // 加入已排序
+                for (let k = 0; k <= i; k++) {
+                    if (!sortedIdx.includes(k)) sortedIdx.push(k);
+                }
+                renderBars(arr, [], sortedIdx);
+                setInfo(`✨ 第 ${i} 輪完成`, `${currentVal} 已插入到位置 [${j + 1}]`);
+                await sleep(getDelay() * 1.5);
+            }
+
+            // 全部標為已排序
+            for (let k = 0; k < n; k++) {
+                if (!sortedIdx.includes(k)) sortedIdx.push(k);
+            }
+            renderBars(arr, [], sortedIdx);
+            setInfo('🏆 排序完成！', `共比較 ${comparisons} 次，移動 ${swaps} 次`);
         }
 
         resetArray();
