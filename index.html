@@ -395,6 +395,7 @@
             <span id="speedLabel">中</span>
         </div>
         <button id="pauseBtn" onclick="togglePause()" disabled style="background: #4a9eff; color: white;">⏸ 暫停</button>
+        <button id="stepBtn" onclick="stepForward()" disabled style="background: #2a2a3a; color: #ccc; border: 1px solid #444;">⏭ 單步</button>
     </div>
 
     <div class="legend">
@@ -432,6 +433,7 @@
         let sorting = false;
         let isPaused = false;
         let isStopped = false; // 用於強制終止排序
+        let stepNext = false;  // 用於單步執行
         let comparisons = 0;
         let swaps = 0;
         let currentAlgo = 'bubble';
@@ -510,8 +512,11 @@
 
         async function sleep(ms) {
             await new Promise(resolve => setTimeout(resolve, ms));
-            while (isPaused && !isStopped) {
+            while (isPaused && !isStopped && !stepNext) {
                 await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            if (stepNext) {
+                stepNext = false; // 消耗掉單步執行的信號，繼續暫停
             }
             if (isStopped) {
                 // 如果觸發停止，拋出錯誤來中斷整條 async 執行鏈
@@ -519,18 +524,26 @@
             }
         }
 
+        function stepForward() {
+            if (!sorting || !isPaused) return;
+            stepNext = true;
+        }
+
         function togglePause() {
             if (!sorting) return;
             isPaused = !isPaused;
             const btn = document.getElementById('pauseBtn');
+            const stepBtn = document.getElementById('stepBtn');
             if (isPaused) {
                 btn.innerHTML = '▶ 繼續';
                 btn.style.background = '#ffd93d';
                 btn.style.color = '#333';
+                stepBtn.disabled = false; // 暫停時可以單步執行
             } else {
                 btn.innerHTML = '⏸ 暫停';
                 btn.style.background = '#4a9eff';
                 btn.style.color = 'white';
+                stepBtn.disabled = true; // 繼續時不能單步執行
             }
         }
 
@@ -582,7 +595,9 @@
             document.getElementById('resetBtn').disabled = true;
             
             const pauseBtn = document.getElementById('pauseBtn');
+            const stepBtn = document.getElementById('stepBtn');
             pauseBtn.disabled = false;
+            stepBtn.disabled = true; // 預設執行中不能單步
             
             comparisons = 0; swaps = 0;
 
@@ -609,10 +624,12 @@
             sorting = false;
             isPaused = false;
             isStopped = false;
+            stepNext = false;
             pauseBtn.disabled = true;
             pauseBtn.innerHTML = '⏸ 暫停';
             pauseBtn.style.background = '#4a9eff';
             pauseBtn.style.color = 'white';
+            stepBtn.disabled = true;
 
             document.getElementById('startBtn').disabled = false;
             document.getElementById('resetBtn').disabled = false;
