@@ -383,7 +383,7 @@
 
     <a class="back-btn" href="#" onclick="showHome(); return false;">← 返回首頁</a>
 
-    <h1 id="algoTitle">🫧 氣泡排序法</h1>
+    <h1 id="algoTitle">氣泡排序法</h1>
     <p class="subtitle" id="algoSubtitle">Bubble Sort — 視覺化動畫解說</p>
 
     <div class="controls">
@@ -395,7 +395,7 @@
             <span id="speedLabel">中</span>
         </div>
         <button id="pauseBtn" onclick="togglePause()" disabled style="background: #4a9eff; color: white;">⏸ 暫停</button>
-        <button id="stepBtn" onclick="stepForward()" disabled style="background: #2a2a3a; color: #ccc; border: 1px solid #444;">⏭ 單步</button>
+        <button id="stepBtn" onclick="stepForward()" style="background: #2a2a3a; color: #ccc; border: 1px solid #444;">⏭ 單步執行</button>
     </div>
 
     <div class="legend">
@@ -440,7 +440,7 @@
 
         const algoData = {
             bubble: {
-                title: '🫧 氣泡排序法',
+                title: '氣泡排序法',
                 subtitle: 'Bubble Sort — 視覺化動畫解說',
                 readyDesc: '按「開始排序」來觀看氣泡排序動畫',
                 explain: `<h3>📖 氣泡排序原理</h3>
@@ -452,7 +452,7 @@
         ⏱ 時間複雜度：最差 O(n²)，最好 O(n)`
             },
             selection: {
-                title: '🔀 選擇排序法',
+                title: '選擇排序法',
                 subtitle: 'Selection Sort — 視覺化動畫解說',
                 readyDesc: '按「開始排序」來觀看選擇排序動畫',
                 explain: `<h3>📖 選擇排序原理</h3>
@@ -464,7 +464,7 @@
         ⏱ 時間複雜度：O(n²)`
             },
             insertion: {
-                title: '🃏 插入排序法',
+                title: '插入排序法',
                 subtitle: 'Insertion Sort — 視覺化動畫解說',
                 readyDesc: '按「開始排序」來觀看插入排序動畫',
                 explain: `<h3>📖 插入排序原理</h3>
@@ -475,7 +475,7 @@
         ⏱ 時間複雜度：最差 O(n²)，最好 O(n)`
             },
             merge: {
-                title: '🧬 合併排序法',
+                title: '合併排序法',
                 subtitle: 'Merge Sort — 視覺化動畫解說',
                 readyDesc: '按「開始排序」來觀看合併排序動畫',
                 explain: `<h3>📖 合併排序原理</h3>
@@ -487,7 +487,7 @@
         ⏱ 時間複雜度：O(n log n)`
             },
             quick: {
-                title: '⚡ 快速排序法',
+                title: '快速排序法',
                 subtitle: 'Quick Sort — 視覺化動畫解說',
                 readyDesc: '按「開始排序」來觀看快速排序動畫',
                 explain: `<h3>📖 快速排序原理</h3>
@@ -525,8 +525,22 @@
         }
 
         function stepForward() {
-            if (!sorting || !isPaused) return;
-            stepNext = true;
+            if (!sorting && arr.length > 0) {
+                // 如果還沒開始排序，先設定為暫停狀態然後自動啟動排序
+                isPaused = true;
+                const btn = document.getElementById('pauseBtn');
+                btn.innerHTML = '▶ 繼續';
+                btn.style.background = '#ffd93d';
+                btn.style.color = '#333';
+                startSort();
+            } else if (sorting && isPaused) {
+                // 如果已經在排序且暫停中，就放行一步
+                stepNext = true;
+            } else if (sorting && !isPaused) {
+                // 如果正在流暢播放中按了單步，則切換為暫停並放行一步
+                togglePause();
+                stepNext = true;
+            }
         }
 
         function togglePause() {
@@ -538,12 +552,10 @@
                 btn.innerHTML = '▶ 繼續';
                 btn.style.background = '#ffd93d';
                 btn.style.color = '#333';
-                stepBtn.disabled = false; // 暫停時可以單步執行
             } else {
                 btn.innerHTML = '⏸ 暫停';
                 btn.style.background = '#4a9eff';
                 btn.style.color = 'white';
-                stepBtn.disabled = true; // 繼續時不能單步執行
             }
         }
 
@@ -597,7 +609,6 @@
             const pauseBtn = document.getElementById('pauseBtn');
             const stepBtn = document.getElementById('stepBtn');
             pauseBtn.disabled = false;
-            stepBtn.disabled = true; // 預設執行中不能單步
             
             comparisons = 0; swaps = 0;
 
@@ -629,7 +640,6 @@
             pauseBtn.innerHTML = '⏸ 暫停';
             pauseBtn.style.background = '#4a9eff';
             pauseBtn.style.color = 'white';
-            stepBtn.disabled = true;
 
             document.getElementById('startBtn').disabled = false;
             document.getElementById('resetBtn').disabled = false;
