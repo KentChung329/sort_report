@@ -314,6 +314,76 @@
             color: #fff;
             background: rgba(123, 47, 247, 0.15);
         }
+
+        /* ===== 左右分割預覽區 (圖表 + 程式碼) ===== */
+        .visualizer-split {
+            display: flex;
+            gap: 24px;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 24px;
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+
+        .visualizer-left {
+            flex: 1 1 60%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .visualizer-left .info-box {
+            margin-top: auto;      /* 自動將這個框推到最下方 */
+            margin-bottom: 0;      /* 移除原本的底邊距，讓底線齊平 */
+        }
+
+        .visualizer-right {
+            flex: 1 1 35%;
+            background: #1a1a2e;
+            border-radius: 12px;
+            border: 1px solid #333;
+            padding: 16px;
+            overflow-y: auto;
+            max-height: 520px;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .code-container-title {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        #codeContainer {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-line {
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #d4d4d4;
+            white-space: pre;
+            transition: background 0.2s, color 0.1s, border-left 0.2s;
+            border-left: 3px solid transparent;
+            margin-bottom: 2px;
+        }
+
+        .code-line.active {
+            background: rgba(123, 47, 247, 0.4);
+            color: #fff;
+            font-weight: bold;
+            border-left: 3px solid #00d4ff;
+        }
     </style>
 </head>
 <body>
@@ -405,17 +475,28 @@
         <div class="legend-item"><div class="legend-color" style="background:#6bff9e"></div>已排序</div>
     </div>
 
-    <div class="array-container" id="arrayContainer"></div>
+    <div class="visualizer-split">
+        <div class="visualizer-left">
+            <div class="array-container" id="arrayContainer"></div>
 
-    <div class="stats">
-        <div class="stat"><div class="val" id="compCount">0</div><div class="label">比較次數</div></div>
-        <div class="stat"><div class="val" id="swapCount">0</div><div class="label">交換次數</div></div>
-        <div class="stat"><div class="val" id="roundCount">0</div><div class="label">目前輪數</div></div>
-    </div>
+            <div class="stats">
+                <div class="stat"><div class="val" id="compCount">0</div><div class="label">比較次數</div></div>
+                <div class="stat"><div class="val" id="swapCount">0</div><div class="label">交換次數</div></div>
+                <div class="stat"><div class="val" id="roundCount">0</div><div class="label">目前輪數</div></div>
+            </div>
 
-    <div class="info-box" id="infoBox">
-        <div class="step-title">準備就緒</div>
-        <div class="step-desc">按「開始排序」來觀看氣泡排序動畫</div>
+            <div class="info-box" id="infoBox">
+                <div class="step-title">準備就緒</div>
+                <div class="step-desc">按「開始排序」來觀看氣泡排序動畫</div>
+            </div>
+        </div>
+
+        <div class="visualizer-right">
+            <div class="code-container-title">📜 程式碼逐行追蹤</div>
+            <div id="codeContainer">
+                <!-- 程式碼將動態生成在此 -->
+            </div>
+        </div>
     </div>
 
     <div class="explain" id="algoExplain">
@@ -449,7 +530,26 @@
         每輪結束後，<b>最大值會「浮」到最右邊</b><br>
         重複 n-1 輪，直到全部排序完成<br>
         <br>
-        ⏱ 時間複雜度：最差 O(n²)，最好 O(n)`
+        ⏱ 時間複雜度：最差 O(n²)，最好 O(n)`,
+                codeLines: [
+                    "function bubbleSort(arr) {", // 0
+                    "  const n = arr.length;", // 1
+                    "  for (let i = 0; i < n - 1; i++) {", // 2
+                    "    let swapped = false;", // 3
+                    "    for (let j = 0; j < n - i - 1; j++) {", // 4
+                    "      if (arr[j] > arr[j+1]) {", // 5
+                    "        // 交換 arr[j] 和 arr[j+1]", // 6
+                    "        let temp = arr[j];", // 7
+                    "        arr[j] = arr[j+1];", // 8
+                    "        arr[j+1] = temp;", // 9
+                    "        swapped = true;", // 10
+                    "      }", // 11
+                    "    }", // 12
+                    "    // 若此輪沒有交換，提早結束", // 13
+                    "    if (!swapped) break;", // 14
+                    "  }", // 15
+                    "}" // 16
+                ]
             },
             selection: {
                 title: '選擇排序法',
@@ -461,7 +561,26 @@
         每輪結束後，<b>最小值會被放置到已排序區間的最尾端</b><br>
         重複 n-1 輪，直到全部排序完成<br>
         <br>
-        ⏱ 時間複雜度：O(n²)`
+        ⏱ 時間複雜度：O(n²)`,
+                codeLines: [
+                    "function selectionSort(arr) {", // 0
+                    "  const n = arr.length;", // 1
+                    "  for (let i = 0; i < n - 1; i++) {", // 2
+                    "    let minIdx = i;", // 3
+                    "    for (let j = i + 1; j < n; j++) {", // 4
+                    "      if (arr[j] < arr[minIdx]) {", // 5
+                    "        minIdx = j;", // 6
+                    "      }", // 7
+                    "    }", // 8
+                    "    if (minIdx !== i) {", // 9
+                    "      // 交換 arr[i] 和 arr[minIdx]", // 10
+                    "      let temp = arr[i];", // 11
+                    "      arr[i] = arr[minIdx];", // 12
+                    "      arr[minIdx] = temp;", // 13
+                    "    }", // 14
+                    "  }", // 15
+                    "}" // 16
+                ]
             },
             insertion: {
                 title: '插入排序法',
@@ -472,7 +591,21 @@
         每次把未排序區間的第一個元素，<b>插入到已排序區間的正確位置</b><br>
         重複 n-1 輪，直到全部排序完成<br>
         <br>
-        ⏱ 時間複雜度：最差 O(n²)，最好 O(n)`
+        ⏱ 時間複雜度：最差 O(n²)，最好 O(n)`,
+                codeLines: [
+                    "function insertionSort(arr) {", // 0
+                    "  const n = arr.length;", // 1
+                    "  for (let i = 1; i < n; i++) {", // 2
+                    "    let currentVal = arr[i];", // 3
+                    "    let j = i - 1;", // 4
+                    "    while (j >= 0 && arr[j] > currentVal) {", // 5
+                    "      arr[j + 1] = arr[j];", // 6
+                    "      j--;", // 7
+                    "    }", // 8
+                    "    arr[j + 1] = currentVal;", // 9
+                    "  }", // 10
+                    "}" // 11
+                ]
             },
             merge: {
                 title: '合併排序法',
@@ -484,7 +617,29 @@
         然後將相鄰的子陣列<b>兩兩合併</b>，合併時依大小排序<br>
         最終合併成完整有序的陣列<br>
         <br>
-        ⏱ 時間複雜度：O(n log n)`
+        ⏱ 時間複雜度：O(n log n)`,
+                codeLines: [
+                    "function mergeSort(arr, start, end) {", // 0
+                    "  if (start >= end) return;", // 1
+                    "  const mid = Math.floor((start + end) / 2);", // 2
+                    "  mergeSort(arr, start, mid);", // 3
+                    "  mergeSort(arr, mid + 1, end);", // 4
+                    "  merge(arr, start, mid, end);", // 5
+                    "}", // 6
+                    "", // 7
+                    "function merge(arr, start, mid, end) {", // 8
+                    "  let temp = [], i = start, j = mid + 1;", // 9
+                    "  while (i <= mid && j <= end) {", // 10
+                    "    if (arr[i] <= arr[j]) temp.push(arr[i++]);", // 11
+                    "    else temp.push(arr[j++]);", // 12
+                    "  }", // 13
+                    "  while (i <= mid) temp.push(arr[i++]);", // 14
+                    "  while (j <= end) temp.push(arr[j++]);", // 15
+                    "  for (let k = start; k <= end; k++) {", // 16
+                    "    arr[k] = temp[k - start];", // 17
+                    "  }", // 18
+                    "}" // 19
+                ]
             },
             quick: {
                 title: '快速排序法',
@@ -496,7 +651,29 @@
         將小於基準的元素移到左邊，大於的移到右邊<br>
         對左右兩邊子陣列重複上述步驟<br>
         <br>
-        ⏱ 時間複雜度：平均 O(n log n)，最差 O(n²)`
+        ⏱ 時間複雜度：平均 O(n log n)，最差 O(n²)`,
+                codeLines: [
+                    "function quickSort(arr, low, high) {", // 0
+                    "  if (low < high) {", // 1
+                    "    let pi = partition(arr, low, high);", // 2
+                    "    quickSort(arr, low, pi - 1);", // 3
+                    "    quickSort(arr, pi + 1, high);", // 4
+                    "  }", // 5
+                    "}", // 6
+                    "", // 7
+                    "function partition(arr, low, high) {", // 8
+                    "  let pivot = arr[high];", // 9
+                    "  let i = low - 1;", // 10
+                    "  for (let j = low; j < high; j++) {", // 11
+                    "    if (arr[j] < pivot) {", // 12
+                    "      i++;", // 13
+                    "      swap(arr[i], arr[j]);", // 14
+                    "    }", // 15
+                    "  }", // 16
+                    "  swap(arr[i + 1], arr[high]);", // 17
+                    "  return i + 1;", // 18
+                    "}" // 19
+                ]
             }
         };
 
@@ -567,6 +744,8 @@
             updateStats();
             renderBars(arr, [], []);
             setInfo('準備就緒', algoData[currentAlgo]?.readyDesc || '按「開始排序」來觀看排序動畫');
+            renderCodeBlock();
+            highlightLine(null);
         }
 
         function renderBars(arr, comparing = [], sorted = [], swapping = []) {
@@ -597,6 +776,32 @@
         function setInfo(title, desc) {
             document.getElementById('infoBox').innerHTML =
                 `<div class="step-title">${title}</div><div class="step-desc">${desc}</div>`;
+        }
+
+        function renderCodeBlock() {
+            const container = document.getElementById('codeContainer');
+            if (algoData[currentAlgo] && algoData[currentAlgo].codeLines) {
+                const lines = algoData[currentAlgo].codeLines;
+                container.innerHTML = lines.map((line, idx) => {
+                    const escaped = line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    return `<div class="code-line" id="code-line-${idx}">${escaped || ' '}</div>`;
+                }).join('');
+            } else {
+                container.innerHTML = '程式碼載入中...';
+            }
+        }
+
+        function highlightLine(lineNum) {
+            document.querySelectorAll('.code-line.active').forEach(el => el.classList.remove('active'));
+            if (lineNum !== undefined && lineNum !== null) {
+                const target = document.getElementById(`code-line-${lineNum}`);
+                if (target) {
+                    target.classList.add('active');
+                    // block: 'nearest' 取代 'center'，這樣就只會在程式碼跑出框外時才讓框內捲動，
+                    // 不會牽連整個網頁跟著上下狂跳！
+                    target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
         }
 
         async function startSort() {
@@ -648,14 +853,17 @@
         async function runBubbleSort() {
             const n = arr.length;
             const sortedIdx = [];
+            highlightLine(1); await sleep(getDelay() * 0.5);
 
             for (let i = 0; i < n - 1; i++) {
+                highlightLine(2); await sleep(getDelay() * 0.5);
                 document.getElementById('roundCount').textContent = i + 1;
                 setInfo(`🔁 第 ${i + 1} 輪`, `從左到右比較，把本輪最大值推到右邊`);
                 let swapped = false;
-                await sleep(getDelay());
+                highlightLine(3); await sleep(getDelay() * 0.5);
 
                 for (let j = 0; j < n - i - 1; j++) {
+                    highlightLine(4); await sleep(getDelay() * 0.5);
                     comparisons++;
                     updateStats();
                     renderBars(arr, [j, j+1], sortedIdx);
@@ -663,24 +871,27 @@
                         arr[j] > arr[j+1]
                             ? `${arr[j]} > ${arr[j+1]}，需要交換 🔄`
                             : `${arr[j]} ≤ ${arr[j+1]}，不需交換 ✅`);
-                    await sleep(getDelay());
+                    highlightLine(5); await sleep(getDelay());
 
                     if (arr[j] > arr[j+1]) {
                         renderBars(arr, [], sortedIdx, [j, j+1]);
-                        await sleep(getDelay() * 0.8);
+                        highlightLine(7); await sleep(getDelay() * 0.4);
                         [arr[j], arr[j+1]] = [arr[j+1], arr[j]];
                         swaps++;
                         updateStats();
                         renderBars(arr, [], sortedIdx, [j, j+1]);
-                        await sleep(getDelay() * 0.8);
+                        highlightLine(8); await sleep(getDelay() * 0.4);
+                        highlightLine(9); await sleep(getDelay() * 0.4);
                         swapped = true;
+                        highlightLine(10); await sleep(getDelay() * 0.4);
                     }
                 }
 
                 sortedIdx.push(n - 1 - i);
                 renderBars(arr, [], sortedIdx);
                 setInfo(`✨ 第 ${i + 1} 輪完成`, `${arr[n-1-i]} 已歸位到正確位置`);
-                await sleep(getDelay() * 1.5);
+                await sleep(getDelay() * 0.8);
+                highlightLine(14); await sleep(getDelay() * 0.5);
 
                 if (!swapped) {
                     setInfo('🎉 提前完成！', '本輪沒有任何交換，陣列已完全排序！');
@@ -691,21 +902,26 @@
             // 全部標為已排序
             for (let k = 0; k < n; k++) if (!sortedIdx.includes(k)) sortedIdx.push(k);
             renderBars(arr, [], sortedIdx);
+            highlightLine(16);
             setInfo('🏆 排序完成！', `共比較 ${comparisons} 次，交換 ${swaps} 次`);
         }
 
         async function runSelectionSort() {
             const n = arr.length;
             const sortedIdx = [];
+            highlightLine(1); await sleep(getDelay() * 0.5);
 
             for (let i = 0; i < n - 1; i++) {
+                highlightLine(2); await sleep(getDelay() * 0.5);
                 document.getElementById('roundCount').textContent = i + 1;
                 let minIdx = i;
+                highlightLine(3); await sleep(getDelay() * 0.5);
                 setInfo(`🔁 第 ${i + 1} 輪`, `目前未排序區從索引 [${i}] 開始，假設其為最小值`);
                 renderBars(arr, [i], sortedIdx);
                 await sleep(getDelay());
 
                 for (let j = i + 1; j < n; j++) {
+                    highlightLine(4); await sleep(getDelay() * 0.5);
                     comparisons++;
                     updateStats();
                     renderBars(arr, [j, minIdx], sortedIdx);
@@ -713,27 +929,30 @@
                         arr[j] < arr[minIdx]
                             ? `更新最小值索引為 ${j} `
                             : `未更新最小值`);
-                    await sleep(getDelay());
+                    highlightLine(5); await sleep(getDelay());
 
                     if (arr[j] < arr[minIdx]) {
                         minIdx = j;
+                        highlightLine(6); await sleep(getDelay() * 0.5);
                         renderBars(arr, [minIdx], sortedIdx);
                         setInfo(`✨ 找到更小的值`, `新最小值為 ${arr[minIdx]} (索引 [${minIdx}])`);
                         await sleep(getDelay() * 0.8);
                     }
                 }
 
+                highlightLine(9); await sleep(getDelay() * 0.5);
                 if (minIdx !== i) {
                     setInfo(`🔄 準備交換`, `將最小值 [${minIdx}]=${arr[minIdx]} 與前端 [${i}]=${arr[i]} 交換`);
                     renderBars(arr, [], sortedIdx, [i, minIdx]);
-                    await sleep(getDelay());
+                    highlightLine(11); await sleep(getDelay() * 0.4);
 
                     [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
                     swaps++;
                     updateStats();
 
                     renderBars(arr, [], sortedIdx, [i, minIdx]);
-                    await sleep(getDelay());
+                    highlightLine(12); await sleep(getDelay() * 0.4);
+                    highlightLine(13); await sleep(getDelay() * 0.4);
                 } else {
                     setInfo(`✅ 無需交換`, `當前值 ${arr[i]} 已經是未排序區的最小值`);
                     await sleep(getDelay());
@@ -742,29 +961,35 @@
                 sortedIdx.push(i);
                 renderBars(arr, [], sortedIdx);
                 setInfo(`✨ 第 ${i + 1} 輪完成`, `${arr[i]} 已歸位到正確位置`);
-                await sleep(getDelay() * 1.5);
+                await sleep(getDelay() * 0.8);
             }
 
             // 全部標為已排序
             for (let k = 0; k < n; k++) if (!sortedIdx.includes(k)) sortedIdx.push(k);
             renderBars(arr, [], sortedIdx);
+            highlightLine(16);
             setInfo('🏆 排序完成！', `共比較 ${comparisons} 次，交換 ${swaps} 次`);
         }
 
         async function runInsertionSort() {
             const n = arr.length;
             const sortedIdx = [0]; // 第一個元素預設已排序
+            highlightLine(1); await sleep(getDelay() * 0.5);
 
             for (let i = 1; i < n; i++) {
+                highlightLine(2); await sleep(getDelay() * 0.4);
                 document.getElementById('roundCount').textContent = i;
                 let currentVal = arr[i];
+                highlightLine(3); await sleep(getDelay() * 0.4);
                 let j = i - 1;
+                highlightLine(4); await sleep(getDelay() * 0.4);
 
                 setInfo(`🔁 第 ${i} 輪`, `取出 [${i}]=${currentVal} 準備插入已排序區間`);
                 renderBars(arr, [i], sortedIdx);
                 await sleep(getDelay());
 
                 while (j >= 0) {
+                    highlightLine(5); await sleep(getDelay() * 0.4);
                     comparisons++;
                     updateStats();
                     renderBars(arr, [j, j + 1], sortedIdx); // 比較
@@ -774,12 +999,12 @@
                     if (arr[j] > currentVal) {
                         setInfo(`🔄 將 ${arr[j]} 往右移`, `因為 ${arr[j]} > ${currentVal}`);
                         renderBars(arr, [], sortedIdx, [j, j + 1]); 
-                        await sleep(getDelay() * 0.8);
+                        highlightLine(6); await sleep(getDelay() * 0.5);
                         arr[j + 1] = arr[j];
                         swaps++;
                         updateStats();
                         renderBars(arr, [], sortedIdx, [j, j + 1]); 
-                        await sleep(getDelay() * 0.8);
+                        highlightLine(7); await sleep(getDelay() * 0.5);
                         j--;
                     } else {
                         setInfo(`✅ 找到位置`, `${arr[j]} ≤ ${currentVal}，停止移動`);
@@ -787,15 +1012,17 @@
                         break;
                     }
                 }
+                highlightLine(5); await sleep(getDelay() * 0.4);
                 
                 arr[j + 1] = currentVal;
+                highlightLine(9); await sleep(getDelay() * 0.5);
                 // 加入已排序
                 for (let k = 0; k <= i; k++) {
                     if (!sortedIdx.includes(k)) sortedIdx.push(k);
                 }
                 renderBars(arr, [], sortedIdx);
                 setInfo(`✨ 第 ${i} 輪完成`, `${currentVal} 已插入到位置 [${j + 1}]`);
-                await sleep(getDelay() * 1.5);
+                await sleep(getDelay() * 0.8);
             }
 
             // 全部標為已排序
@@ -803,6 +1030,7 @@
                 if (!sortedIdx.includes(k)) sortedIdx.push(k);
             }
             renderBars(arr, [], sortedIdx);
+            highlightLine(11);
             setInfo('🏆 排序完成！', `共比較 ${comparisons} 次，移動 ${swaps} 次`);
         }
 
@@ -811,10 +1039,13 @@
             const sortedIdx = [];
             
             async function merge(start, mid, end) {
+                highlightLine(8); await sleep(getDelay() * 0.4);
                 let temp = [];
                 let i = start, j = mid + 1;
+                highlightLine(9); await sleep(getDelay() * 0.4);
                 
                 while (i <= mid && j <= end) {
+                    highlightLine(10); await sleep(getDelay() * 0.4);
                     comparisons++;
                     updateStats();
                     renderBars(arr, [i, j], sortedIdx);
@@ -823,35 +1054,49 @@
                     
                     if (arr[i] <= arr[j]) {
                         temp.push(arr[i++]);
+                        highlightLine(11); await sleep(getDelay() * 0.4);
                     } else {
                         temp.push(arr[j++]);
+                        highlightLine(12); await sleep(getDelay() * 0.4);
                     }
                 }
-                while (i <= mid) temp.push(arr[i++]);
-                while (j <= end) temp.push(arr[j++]);
+                while (i <= mid) { highlightLine(14); await sleep(getDelay() * 0.2); temp.push(arr[i++]); }
+                while (j <= end) { highlightLine(15); await sleep(getDelay() * 0.2); temp.push(arr[j++]); }
                 
                 for (let k = start; k <= end; k++) {
+                    highlightLine(16); await sleep(getDelay() * 0.2);
                     arr[k] = temp[k - start];
+                    highlightLine(17); await sleep(getDelay() * 0.4);
                     swaps++; // 算作寫入（合併的陣列更新概念）
                     updateStats();
                     renderBars(arr, [k], sortedIdx, [k]);
                     setInfo(`🔄 合併寫入`, `將 ${arr[k]} 寫回位置 [${k}]`);
                     await sleep(getDelay() * 0.8);
                 }
+                highlightLine(19); await sleep(getDelay() * 0.4);
             }
 
             async function mergeSortHelper(start, end) {
+                highlightLine(0); await sleep(getDelay() * 0.4);
+                highlightLine(1); await sleep(getDelay() * 0.2);
                 if (start >= end) return;
+                
+                highlightLine(2); await sleep(getDelay() * 0.4);
                 const mid = Math.floor((start + end) / 2);
                 setInfo(`✂️ 分割陣列`, `將區間 [${start}~${end}] 分為 [${start}~${mid}] 和 [${mid+1}~${end}]`);
                 await sleep(getDelay());
                 
+                highlightLine(3); await sleep(getDelay() * 0.4);
                 await mergeSortHelper(start, mid);
+                
+                highlightLine(4); await sleep(getDelay() * 0.4);
                 await mergeSortHelper(mid + 1, end);
                 
                 setInfo(`🧬 準備合併`, `合併區間 [${start}~${mid}] 和 [${mid+1}~${end}]`);
                 await sleep(getDelay());
+                highlightLine(5); await sleep(getDelay() * 0.4);
                 await merge(start, mid, end);
+                highlightLine(6); await sleep(getDelay() * 0.4);
             }
 
             document.getElementById('roundCount').textContent = '-';
@@ -859,6 +1104,7 @@
             
             for (let k = 0; k < n; k++) sortedIdx.push(k);
             renderBars(arr, [], sortedIdx);
+            highlightLine(null);
             setInfo('🏆 排序完成！', `共比較 ${comparisons} 次，陣列寫入 ${swaps} 次`);
         }
 
@@ -867,36 +1113,44 @@
             const sortedIdx = [];
 
             async function partition(low, high) {
+                highlightLine(8); await sleep(getDelay() * 0.4);
                 const pivot = arr[high];
+                highlightLine(9); await sleep(getDelay() * 0.2);
                 let i = low - 1;
+                highlightLine(10); await sleep(getDelay() * 0.2);
 
                 setInfo(`🎯 選擇基準`, `以區間最後一個元素 [${high}]=${pivot} 作為基準(Pivot)`);
                 renderBars(arr, [high], sortedIdx);
                 await sleep(getDelay() * 1.5);
 
                 for (let j = low; j < high; j++) {
+                    highlightLine(11); await sleep(getDelay() * 0.4);
                     comparisons++;
                     updateStats();
                     renderBars(arr, [j, high], sortedIdx); 
                     setInfo(`🔍 比較`, `檢查 [${j}]=${arr[j]} 是否小於基準 ${pivot}`);
-                    await sleep(getDelay());
+                    highlightLine(12); await sleep(getDelay());
 
                     if (arr[j] < pivot) {
                         i++;
+                        highlightLine(13); await sleep(getDelay() * 0.4);
                         if (i !== j) {
                             setInfo(`🔄 交換`, `因為 ${arr[j]} < ${pivot}，將其與 [${i}]=${arr[i]} 交換`);
                             renderBars(arr, [], sortedIdx, [i, j]);
-                            await sleep(getDelay() * 0.8);
+                            highlightLine(14); await sleep(getDelay() * 0.4);
                             [arr[i], arr[j]] = [arr[j], arr[i]];
                             swaps++;
                             updateStats();
                             renderBars(arr, [], sortedIdx, [i, j]);
                             await sleep(getDelay() * 0.8);
+                        } else {
+                            highlightLine(14); await sleep(getDelay() * 0.4);
                         }
                     }
                 }
                 
                 i++;
+                highlightLine(17); await sleep(getDelay() * 0.4);
                 if (i !== high) {
                     setInfo(`🔄 基準歸位`, `將基準 ${pivot} 移動到正確位置 [${i}]`);
                     renderBars(arr, [], sortedIdx, [i, high]);
@@ -913,13 +1167,19 @@
 
                 sortedIdx.push(i);
                 renderBars(arr, [], sortedIdx);
+                highlightLine(18); await sleep(getDelay() * 0.4);
                 return i;
             }
 
             async function quickSortHelper(low, high) {
+                highlightLine(0); await sleep(getDelay() * 0.4);
+                highlightLine(1); await sleep(getDelay() * 0.2);
                 if (low < high) {
+                    highlightLine(2); await sleep(getDelay() * 0.4);
                     const pi = await partition(low, high);
+                    highlightLine(3); await sleep(getDelay() * 0.4);
                     await quickSortHelper(low, pi - 1);
+                    highlightLine(4); await sleep(getDelay() * 0.4);
                     await quickSortHelper(pi + 1, high);
                 } else if (low === high) {
                     if (!sortedIdx.includes(low)) sortedIdx.push(low);
@@ -932,6 +1192,7 @@
             
             for (let k = 0; k < n; k++) if (!sortedIdx.includes(k)) sortedIdx.push(k);
             renderBars(arr, [], sortedIdx);
+            highlightLine(null);
             setInfo('🏆 排序完成！', `共比較 ${comparisons} 次，交換 ${swaps} 次`);
         }
 
