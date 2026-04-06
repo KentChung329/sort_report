@@ -384,6 +384,35 @@
             font-weight: bold;
             border-left: 3px solid #00d4ff;
         }
+
+        /* ===== 演算法標籤 Badge ===== */
+        .algo-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .algo-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: rgba(123, 47, 247, 0.15);
+            color: #d8b4fe;
+            border: 1px solid rgba(123, 47, 247, 0.3);
+        }
+
+        .algo-badge i {
+            margin-right: 6px;
+            font-style: normal;
+        }
+
+        .algo-badge.best { background: rgba(0, 212, 255, 0.1); color: #8cf2ff; border-color: rgba(0, 212, 255, 0.25); }
+        .algo-badge.worst { background: rgba(255, 107, 107, 0.1); color: #ffb3b3; border-color: rgba(255, 107, 107, 0.25); }
+        .algo-badge.space { background: rgba(107, 255, 158, 0.1); color: #b3ffcc; border-color: rgba(107, 255, 158, 0.25); }
+        .algo-badge.stable { background: rgba(255, 217, 61, 0.1); color: #ffeab3; border-color: rgba(255, 217, 61, 0.25); }
     </style>
 </head>
 <body>
@@ -505,8 +534,12 @@
         若 <b>左 &gt; 右</b>，則交換位置<br>
         每輪結束後，<b>最大值會「浮」到最右邊</b><br>
         重複 n-1 輪，直到全部排序完成<br>
-        <br>
-        ⏱ 時間複雜度：最差 O(n²)，最好 O(n)
+        <div class="algo-badges">
+            <span class="algo-badge best"><i>⏱</i>最佳: O(n)</span>
+            <span class="algo-badge worst"><i>⏱</i>平均/最差: O(n²)</span>
+            <span class="algo-badge space"><i>💾</i>空間: O(1)</span>
+            <span class="algo-badge stable"><i>⚖️</i>穩定性: 穩定 (Stable)</span>
+        </div>
     </div>
 
     <script>
@@ -529,8 +562,12 @@
         若 <b>左 &gt; 右</b>，則交換位置<br>
         每輪結束後，<b>最大值會「浮」到最右邊</b><br>
         重複 n-1 輪，直到全部排序完成<br>
-        <br>
-        ⏱ 時間複雜度：最差 O(n²)，最好 O(n)`,
+        <div class="algo-badges">
+            <span class="algo-badge best"><i>⏱</i>最佳: O(n)</span>
+            <span class="algo-badge worst"><i>⏱</i>平均/最差: O(n²)</span>
+            <span class="algo-badge space"><i>💾</i>空間: O(1)</span>
+            <span class="algo-badge stable"><i>⚖️</i>穩定性: 穩定 (Stable)</span>
+        </div>`,
                 codeLines: [
                     "function bubbleSort(arr) {", // 0
                     "  const n = arr.length;", // 1
@@ -560,8 +597,12 @@
         將該最小值與未排序區間的<b>第一個元素交換</b><br>
         每輪結束後，<b>最小值會被放置到已排序區間的最尾端</b><br>
         重複 n-1 輪，直到全部排序完成<br>
-        <br>
-        ⏱ 時間複雜度：O(n²)`,
+        <div class="algo-badges">
+            <span class="algo-badge best"><i>⏱</i>最佳: O(n²)</span>
+            <span class="algo-badge worst"><i>⏱</i>平均/最差: O(n²)</span>
+            <span class="algo-badge space"><i>💾</i>空間: O(1)</span>
+            <span class="algo-badge worst"><i>⚖️</i>穩定性: 不穩定 (Unstable)</span>
+        </div>`,
                 codeLines: [
                     "function selectionSort(arr) {", // 0
                     "  const n = arr.length;", // 1
@@ -590,8 +631,12 @@
         將陣列分為「已排序」和「未排序」區間<br>
         每次把未排序區間的第一個元素，<b>插入到已排序區間的正確位置</b><br>
         重複 n-1 輪，直到全部排序完成<br>
-        <br>
-        ⏱ 時間複雜度：最差 O(n²)，最好 O(n)`,
+        <div class="algo-badges">
+            <span class="algo-badge best"><i>⏱</i>最佳: O(n)</span>
+            <span class="algo-badge worst"><i>⏱</i>平均/最差: O(n²)</span>
+            <span class="algo-badge space"><i>💾</i>空間: O(1)</span>
+            <span class="algo-badge stable"><i>⚖️</i>穩定性: 穩定 (Stable)</span>
+        </div>`,
                 codeLines: [
                     "function insertionSort(arr) {", // 0
                     "  const n = arr.length;", // 1
@@ -616,8 +661,11 @@
         將陣列不斷對半分割，直到每個子陣列只剩一個元素<br>
         然後將相鄰的子陣列<b>兩兩合併</b>，合併時依大小排序<br>
         最終合併成完整有序的陣列<br>
-        <br>
-        ⏱ 時間複雜度：O(n log n)`,
+        <div class="algo-badges">
+            <span class="algo-badge best"><i>⏱</i>最佳/最差: O(n log n)</span>
+            <span class="algo-badge space"><i>💾</i>空間: O(n)</span>
+            <span class="algo-badge stable"><i>⚖️</i>穩定性: 穩定 (Stable)</span>
+        </div>`,
                 codeLines: [
                     "function mergeSort(arr, start, end) {", // 0
                     "  if (start >= end) return;", // 1
@@ -650,8 +698,12 @@
         從陣列中挑選一個元素作為<b>基準 (Pivot)</b><br>
         將小於基準的元素移到左邊，大於的移到右邊<br>
         對左右兩邊子陣列重複上述步驟<br>
-        <br>
-        ⏱ 時間複雜度：平均 O(n log n)，最差 O(n²)`,
+        <div class="algo-badges">
+            <span class="algo-badge best"><i>⏱</i>最佳/平均: O(n log n)</span>
+            <span class="algo-badge worst"><i>⏱</i>最差: O(n²)</span>
+            <span class="algo-badge space"><i>💾</i>空間: O(log n)</span>
+            <span class="algo-badge worst"><i>⚖️</i>穩定性: 不穩定 (Unstable)</span>
+        </div>`,
                 codeLines: [
                     "function quickSort(arr, low, high) {", // 0
                     "  if (low < high) {", // 1
