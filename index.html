@@ -800,7 +800,7 @@
             highlightLine(null);
         }
 
-        function renderBars(arr, comparing = [], sorted = [], swapping = []) {
+        function renderBars(arr, comparing = [], sorted = [], swapping = [], extras = {}) {
             const container = document.getElementById('arrayContainer');
             container.innerHTML = '';
             const maxVal = Math.max(...arr);
@@ -812,8 +812,19 @@
                 else if (comparing.includes(i)) state = 'comparing';
                 else if (sorted.includes(i)) state = 'sorted';
 
+                let styleStr = "";
+                if (extras.gapAt === i) {
+                    styleStr += "margin-right: 40px;";
+                }
+                if (extras.dimOutside && (i < extras.dimOutside[0] || i > extras.dimOutside[1])) {
+                    styleStr += "opacity: 0.15;";
+                }
+                if (extras.pivot === i) {
+                    styleStr += "box-shadow: 0 0 15px #f472b6, inset 0 0 10px #f472b6; border: 2px solid #f472b6;";
+                }
+
                 container.innerHTML += `
-                    <div class="bar ${state}">
+                    <div class="bar ${state}" style="${styleStr}">
                         <div class="bar-inner" style="height:${barHeight}px">${val}</div>
                         <div class="bar-label">[${i}]</div>
                     </div>`;
@@ -969,14 +980,14 @@
                 let minIdx = i;
                 highlightLine(3); await sleep(getDelay() * 0.5);
                 setInfo(`🔁 第 ${i + 1} 輪`, `目前未排序區從索引 [${i}] 開始，假設其為最小值`);
-                renderBars(arr, [i], sortedIdx);
+                renderBars(arr, [i], sortedIdx, [], { dimOutside: [i, n - 1] });
                 await sleep(getDelay());
 
                 for (let j = i + 1; j < n; j++) {
                     highlightLine(4); await sleep(getDelay() * 0.5);
                     comparisons++;
                     updateStats();
-                    renderBars(arr, [j, minIdx], sortedIdx);
+                    renderBars(arr, [j, minIdx], sortedIdx, [], { dimOutside: [i, n - 1] });
                     setInfo(`🔍 比較 [${j}]=${arr[j]} 和 目前最小值 [${minIdx}]=${arr[minIdx]}`,
                         arr[j] < arr[minIdx]
                             ? `更新最小值索引為 ${j} `
@@ -986,7 +997,7 @@
                     if (arr[j] < arr[minIdx]) {
                         minIdx = j;
                         highlightLine(6); await sleep(getDelay() * 0.5);
-                        renderBars(arr, [minIdx], sortedIdx);
+                        renderBars(arr, [minIdx], sortedIdx, [], { dimOutside: [i, n - 1] });
                         setInfo(`✨ 找到更小的值`, `新最小值為 ${arr[minIdx]} (索引 [${minIdx}])`);
                         await sleep(getDelay() * 0.8);
                     }
@@ -995,14 +1006,14 @@
                 highlightLine(9); await sleep(getDelay() * 0.5);
                 if (minIdx !== i) {
                     setInfo(`🔄 準備交換`, `將最小值 [${minIdx}]=${arr[minIdx]} 與前端 [${i}]=${arr[i]} 交換`);
-                    renderBars(arr, [], sortedIdx, [i, minIdx]);
+                    renderBars(arr, [], sortedIdx, [i, minIdx], { dimOutside: [i, n - 1] });
                     highlightLine(11); await sleep(getDelay() * 0.4);
 
                     [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
                     swaps++;
                     updateStats();
 
-                    renderBars(arr, [], sortedIdx, [i, minIdx]);
+                    renderBars(arr, [], sortedIdx, [i, minIdx], { dimOutside: [i, n - 1] });
                     highlightLine(12); await sleep(getDelay() * 0.4);
                     highlightLine(13); await sleep(getDelay() * 0.4);
                 } else {
@@ -1037,25 +1048,25 @@
                 highlightLine(4); await sleep(getDelay() * 0.4);
 
                 setInfo(`🔁 第 ${i} 輪`, `取出 [${i}]=${currentVal} 準備插入已排序區間`);
-                renderBars(arr, [i], sortedIdx);
+                renderBars(arr, [i], sortedIdx, [], { dimOutside: [i, n - 1] });
                 await sleep(getDelay());
 
                 while (j >= 0) {
                     highlightLine(5); await sleep(getDelay() * 0.4);
                     comparisons++;
                     updateStats();
-                    renderBars(arr, [j, j + 1], sortedIdx); // 比較
+                    renderBars(arr, [j, j + 1], sortedIdx, [], { dimOutside: [0, i] });  // 比較
                     setInfo(`🔍 比較`, `目前元素 ${currentVal} 和 [${j}]=${arr[j]}`);
                     await sleep(getDelay());
 
                     if (arr[j] > currentVal) {
                         setInfo(`🔄 將 ${arr[j]} 往右移`, `因為 ${arr[j]} > ${currentVal}`);
-                        renderBars(arr, [], sortedIdx, [j, j + 1]); 
+                        renderBars(arr, [], sortedIdx, [j, j + 1], { dimOutside: [0, i] }); 
                         highlightLine(6); await sleep(getDelay() * 0.5);
                         arr[j + 1] = arr[j];
                         swaps++;
                         updateStats();
-                        renderBars(arr, [], sortedIdx, [j, j + 1]); 
+                        renderBars(arr, [], sortedIdx, [j, j + 1], { dimOutside: [0, i] }); 
                         highlightLine(7); await sleep(getDelay() * 0.5);
                         j--;
                     } else {
@@ -1094,13 +1105,14 @@
                 highlightLine(8); await sleep(getDelay() * 0.4);
                 let temp = [];
                 let i = start, j = mid + 1;
+                renderBars(arr, [], sortedIdx, [], { gapAt: mid, dimOutside: [start, end] });
                 highlightLine(9); await sleep(getDelay() * 0.4);
                 
                 while (i <= mid && j <= end) {
                     highlightLine(10); await sleep(getDelay() * 0.4);
                     comparisons++;
                     updateStats();
-                    renderBars(arr, [i, j], sortedIdx);
+                    renderBars(arr, [i, j], sortedIdx, [], { gapAt: mid, dimOutside: [start, end] });
                     setInfo(`🔍 比較`, `比較左半部 [${i}]=${arr[i]} 和右半部 [${j}]=${arr[j]}`);
                     await sleep(getDelay());
                     
@@ -1121,7 +1133,7 @@
                     highlightLine(17); await sleep(getDelay() * 0.4);
                     swaps++; // 算作寫入（合併的陣列更新概念）
                     updateStats();
-                    renderBars(arr, [k], sortedIdx, [k]);
+                    renderBars(arr, [k], sortedIdx, [k], { gapAt: -1, dimOutside: [start, end] });
                     setInfo(`🔄 合併寫入`, `將 ${arr[k]} 寫回位置 [${k}]`);
                     await sleep(getDelay() * 0.8);
                 }
@@ -1135,8 +1147,9 @@
                 
                 highlightLine(2); await sleep(getDelay() * 0.4);
                 const mid = Math.floor((start + end) / 2);
-                setInfo(`✂️ 分割陣列`, `將區間 [${start}~${end}] 分為 [${start}~${mid}] 和 [${mid+1}~${end}]`);
-                await sleep(getDelay());
+                renderBars(arr, [], sortedIdx, [], { gapAt: mid, dimOutside: [start, end] });
+                setInfo(`✂️ 分割陣列`, `將區間 [${start}~${end}] 從中間切開，分為左半 [${start}~${mid}] 和右半 [${mid+1}~${end}]`);
+                await sleep(getDelay() * 1.5);
                 
                 highlightLine(3); await sleep(getDelay() * 0.4);
                 await mergeSortHelper(start, mid);
@@ -1172,14 +1185,14 @@
                 highlightLine(10); await sleep(getDelay() * 0.2);
 
                 setInfo(`🎯 選擇基準`, `以區間最後一個元素 [${high}]=${pivot} 作為基準(Pivot)`);
-                renderBars(arr, [high], sortedIdx);
+                renderBars(arr, [high], sortedIdx, [], { dimOutside: [low, high], pivot: high });
                 await sleep(getDelay() * 1.5);
 
                 for (let j = low; j < high; j++) {
                     highlightLine(11); await sleep(getDelay() * 0.4);
                     comparisons++;
                     updateStats();
-                    renderBars(arr, [j, high], sortedIdx); 
+                    renderBars(arr, [j, high], sortedIdx, [], { dimOutside: [low, high], pivot: high }); 
                     setInfo(`🔍 比較`, `檢查 [${j}]=${arr[j]} 是否小於基準 ${pivot}`);
                     highlightLine(12); await sleep(getDelay());
 
@@ -1188,12 +1201,12 @@
                         highlightLine(13); await sleep(getDelay() * 0.4);
                         if (i !== j) {
                             setInfo(`🔄 交換`, `因為 ${arr[j]} < ${pivot}，將其與 [${i}]=${arr[i]} 交換`);
-                            renderBars(arr, [], sortedIdx, [i, j]);
+                            renderBars(arr, [], sortedIdx, [i, j], { dimOutside: [low, high], pivot: high });
                             highlightLine(14); await sleep(getDelay() * 0.4);
                             [arr[i], arr[j]] = [arr[j], arr[i]];
                             swaps++;
                             updateStats();
-                            renderBars(arr, [], sortedIdx, [i, j]);
+                            renderBars(arr, [], sortedIdx, [i, j], { dimOutside: [low, high], pivot: high });
                             await sleep(getDelay() * 0.8);
                         } else {
                             highlightLine(14); await sleep(getDelay() * 0.4);
@@ -1205,12 +1218,12 @@
                 highlightLine(17); await sleep(getDelay() * 0.4);
                 if (i !== high) {
                     setInfo(`🔄 基準歸位`, `將基準 ${pivot} 移動到正確位置 [${i}]`);
-                    renderBars(arr, [], sortedIdx, [i, high]);
+                    renderBars(arr, [], sortedIdx, [i, high], { dimOutside: [low, high], pivot: high });
                     await sleep(getDelay() * 0.8);
                     [arr[i], arr[high]] = [arr[high], arr[i]];
                     swaps++;
                     updateStats();
-                    renderBars(arr, [], sortedIdx, [i, high]);
+                    renderBars(arr, [], sortedIdx, [i, high], { dimOutside: [low, high], pivot: high });
                     await sleep(getDelay() * 0.8);
                 } else {
                     setInfo(`✅ 基準歸位`, `基準 ${pivot} 位置 [${i}] 已正確`);
